@@ -44,7 +44,10 @@ class ApiService {
         return _handleResponse(response);
       } else if (response.statusCode == 400) {
         return _handleResponse(response);
-      } else {
+      }
+     else if (response.statusCode == 401) {
+        return _handleResponse(response);
+      }  else {
         // Handle different HTTP error status codes
         return _handleError(
           'Request failed with status: ${response.statusCode}',

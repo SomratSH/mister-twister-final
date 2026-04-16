@@ -7,7 +7,7 @@ class AuthImp implements AuthRepository {
 
   @override
   Future<Map<String, dynamic>> signUp(Map<String, dynamic> body) async {
-    final response = await _apiService.postData(AppUrls.signUp, body);
+    final response = await _apiService.postDataRegular(AppUrls.signUp, body);
     return response;
   }
 

@@ -120,56 +120,59 @@ class _UserRoleScreenState extends State<UserRoleScreen>
               const SizedBox(height: 40),
 
               // Continue Button
-              GestureDetector(
-                onTap: () async {
-                  // Get.toNamed(
-                  //   AppRoutes.profileUpdate.path,
-                  //   arguments: controller.selectedRole.value,
-                  // );
-                  final status = await controller.signUp();
-                  if (status) {
-                    CustomSnackbar.show(context, message: "Signup succesfully");
-                    context.go(RoutePath.login);
-                  } else {
-                    CustomSnackbar.show(
-                      context,
-                      message: "Please, try again",
-                      backgroundColor: Colors.red,
-                    );
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    gradient: (controller.selectedRole == UserRole.customer
-                        ? AppColors.pinkGradient
-                        : AppColors.blueGradient),
-                    borderRadius: BorderRadius.circular(50),
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            (controller.selectedRole == UserRole.customer
-                                    ? AppColors.primaryPink
-                                    : AppColors.primaryBlue)
-                                .withAlpha(76),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Continue',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
+             GestureDetector(
+  onTap: controller.isLoading 
+      ? null // Disable tap while loading
+      : () async {
+          final status = await controller.signUp(context);
+          if (status) {
+            // Note: Since you handle the success snackbar in the provider 
+            // usually, you can keep or remove this one.
+            CustomSnackbar.show(context, message: "Signup successfully");
+            context.go(RoutePath.login);
+          }
+        },
+  child: Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(vertical: 16),
+    decoration: BoxDecoration(
+      gradient: (controller.selectedRole == UserRole.customer
+          ? AppColors.pinkGradient
+          : AppColors.blueGradient),
+      borderRadius: BorderRadius.circular(50),
+      boxShadow: [
+        BoxShadow(
+          color: (controller.selectedRole == UserRole.customer
+                  ? AppColors.primaryPink
+                  : AppColors.primaryBlue)
+              .withAlpha(76),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Center(
+      // 🔥 Show loading indicator if isLoading is true
+      child: controller.isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
               ),
+            )
+          : const Text(
+              'Continue',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+    ),
+  ),
+),
             ],
           ),
         ),

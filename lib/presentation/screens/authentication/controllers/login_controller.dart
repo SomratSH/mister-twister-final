@@ -46,33 +46,37 @@ class LoginProvider extends ChangeNotifier {
         "password": password,
       });
 
-      if (response["access"] != null) {
+      // 1. Check if login was successful (token exists)
+      if (response.isNotEmpty && response["access"] != null) {
         final data = await _authRepository.authUserDetails(response["access"]);
-        print(data);
-        if (data["user_type"] != null) {
+
+        if (data.isNotEmpty && data["user_type"] != null) {
+          emailController.clear();
+          passwordController.clear();
           await prefs.setString('authToken', response["access"]);
-          await prefs.setString('refreshToken', response["refresh"].toString());
+          await prefs.setString(
+            'refreshToken',
+            response["refresh"]?.toString() ?? "",
+          );
           await prefs.setString("userType", data["user_type"]);
 
           CustomSnackbar.show(context, message: "Login Successful");
+          return data["user_type"]; // Return immediately on success
         }
-        isLoading = false;
-        notifyListeners();
-        return data["user_type"];
-      } else {
-        isLoading = false;
-        notifyListeners();
-        CustomSnackbar.show(
-          context,
-          message: response["message"] ?? "Login Failed",
-        );
       }
+
+      // 2. Handle specific Error message from your API JSON ("detail")
+      String errorMessage =
+          response?["detail"] ?? response?["message"] ?? "Login Failed";
+      CustomSnackbar.show(context, message: errorMessage);
     } catch (e) {
-       isLoading = false;
-      notifyListeners();
       debugPrint("Login error: $e");
-      CustomSnackbar.show(context, message: "Something went wrong");
+      CustomSnackbar.show(
+        context,
+        message: "Connection error or server unavailable",
+      );
     } finally {
+      // 3. Centralized cleanup
       isLoading = false;
       notifyListeners();
     }
